@@ -1,0 +1,118 @@
+{
+  "poll_interval_seconds": 30,
+  "admin_secret_token": "dev-secret-token-change-in-prod",
+  "emergency_notice": null,
+  "ad_strategy": {
+    "yektanet_enabled": true,
+    "min_seconds_between_ads": 90,
+    "rewarded_multiplier": 1.0
+  },
+  "formulas": {
+    "ounce_to_gram": 31.1035,
+    "mint_fee_toman": 7000.0,
+    "default_jeweler_profit_pct": 7.0,
+    "default_vat_pct": 9.0
+  },
+  "assets": [
+    {
+      "id": "gold_18k",
+      "symbol": "GLD18K",
+      "name_fa": "طلای ۱۸ عیار",
+      "category": "gold",
+      "enabled": true,
+      "display_order": 1,
+      "weight_gram": 1.0,
+      "purity": 0.750
+    },
+    {
+      "id": "coin_emami",
+      "symbol": "EMAMI",
+      "name_fa": "سکه امامی",
+      "category": "coin",
+      "enabled": true,
+      "display_order": 2,
+      "weight_gram": 8.133,
+      "purity": 0.900
+    },
+    {
+      "id": "coin_half",
+      "symbol": "HALF",
+      "name_fa": "نیم سکه",
+      "category": "coin",
+      "enabled": true,
+      "display_order": 3,
+      "weight_gram": 4.066,
+      "purity": 0.900
+    },
+    {
+      "id": "coin_quarter",
+      "symbol": "QUARTER",
+      "name_fa": "ربع سکه",
+      "category": "coin",
+      "enabled": true,
+      "display_order": 4,
+      "weight_gram": 2.033,
+      "purity": 0.900
+    },
+    {
+      "id": "coin_gerami",
+      "symbol": "GERAMI",
+      "name_fa": "سکه گرمی",
+      "category": "coin",
+      "enabled": true,
+      "display_order": 5,
+      "weight_gram": 1.010,
+      "purity": 0.900
+    },
+    {
+      "id": "usd_free",
+      "symbol": "USD",
+      "name_fa": "دلار آمریکا (آزاد)",
+      "category": "fx",
+      "enabled": true,
+      "display_order": 6,
+      "weight_gram": 0.0,
+      "purity": 0.0
+    },
+    {
+      "id": "usdt",
+      "symbol": "USDT",
+      "name_fa": "تتر (USDT)",
+      "category": "crypto",
+      "enabled": true,
+      "display_order": 7,
+      "weight_gram": 0.0,
+      "purity": 0.0
+    },
+    {
+      "id": "aed_free",
+      "symbol": "AED",
+      "name_fa": "درهم امارات",
+      "category": "fx",
+      "enabled": true,
+      "display_order": 8,
+      "weight_gram": 0.0,
+      "purity": 0.0
+    },
+    {
+      "id": "xau_ounce",
+      "symbol": "XAU",
+      "name_fa": "انس جهانی طلا",
+      "category": "benchmark",
+      "enabled": true,
+      "display_order": 9,
+      "weight_gram": 31.1035,
+      "purity": 1.0
+    },
+    {
+      "id": "btc",
+      "symbol": "BTC",
+      "name_fa": "بیت‌کوین",
+      "category": "crypto",
+      "enabled": true,
+      "display_order": 10,
+      "weight_gram": 0.0,
+      "purity": 0.0
+    }
+  ]
+}
