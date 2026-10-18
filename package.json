@@ -1,0 +1,27 @@
+{
+  "name": "smart-bubble-calc",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Enterprise Iranian coin bubble calculator & market terminal monorepo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sinavali/Smart-Bubble-Calc.git"
+  },
+  "packageManager": "pnpm@10.5.2",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "nx": "nx",
+    "lint": "python3 scripts/ep.py run-many --target=lint",
+    "test": "python3 scripts/ep.py run-many --target=test",
+    "build": "python3 scripts/ep.py run-many --target=build",
+    "audit": "python3 scripts/ep.py run-many --target=audit",
+    "verify": "python3 scripts/ep.py verify",
+    "ep": "python3 scripts/ep.py"
+  },
+  "devDependencies": {
+    "@nx/devkit": "^20.0.0",
+    "nx": "^20.0.0"
+  }
+}

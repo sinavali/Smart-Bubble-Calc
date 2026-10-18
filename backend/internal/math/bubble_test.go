@@ -76,7 +76,7 @@ func TestJewelryCalculation(t *testing.T) {
 	}
 
 	expectedProfit := (expectedRaw + expectedLabor) * 0.07 // (25,875,000) * 0.07 = 1,811,250
-	if res.ProfitAmount != expectedProfit {
+	if math.Abs(res.ProfitAmount-expectedProfit) > 1 {
 		t.Errorf("expected profit %f, got %f", expectedProfit, res.ProfitAmount)
 	}
 

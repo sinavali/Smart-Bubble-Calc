@@ -1,3 +1,13 @@
+# EP-OS Sessions & Workspace Ephemera
+.ep/sessions/
+.freebuff/
+
+# Monorepo / Node / Nx
+node_modules/
+.nx/
+dist/
+coverage/
+
 # Binaries & build artifacts
 *.exe
 *.exe~
@@ -8,6 +18,12 @@
 *.out
 bubble-server
 coverage.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
 
 # Go
 backend/vendor/

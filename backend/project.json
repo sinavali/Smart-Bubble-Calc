@@ -1,0 +1,48 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "backend",
+  "projectType": "application",
+  "sourceRoot": "backend",
+  "tags": [
+    "profile:a",
+    "scope:backend",
+    "lang:go"
+  ],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "if command -v go >/dev/null 2>&1; then go vet ./...; else podman run --rm -v $(pwd):/app:Z -w /app docker.io/library/golang:1.23-alpine go vet ./...; fi",
+        "cwd": "backend"
+      },
+      "inputs": ["default"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "if command -v go >/dev/null 2>&1; then go test -v ./...; else podman run --rm -v $(pwd):/app:Z -w /app docker.io/library/golang:1.23-alpine go test -v ./...; fi",
+        "cwd": "backend"
+      },
+      "inputs": ["default", "^production"],
+      "outputs": ["{projectRoot}/coverage.txt"]
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "if command -v go >/dev/null 2>&1; then CGO_ENABLED=0 go build -ldflags=\"-s -w\" -o bubble-server ./cmd/server; else podman run --rm -v $(pwd):/app:Z -w /app docker.io/library/golang:1.23-alpine sh -c 'CGO_ENABLED=0 go build -ldflags=\"-s -w\" -o bubble-server ./cmd/server'; fi",
+        "cwd": "backend"
+      },
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/bubble-server"]
+    },
+    "audit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 ../scripts/audit-runner.py --scope .",
+        "cwd": "backend"
+      },
+      "inputs": ["default"]
+    }
+  }
+}

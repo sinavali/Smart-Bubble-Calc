@@ -1,0 +1,45 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "contracts",
+  "projectType": "library",
+  "sourceRoot": "contracts/schemas",
+  "tags": [
+    "profile:d",
+    "scope:shared",
+    "lang:openapi"
+  ],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 -c \"import yaml; yaml.safe_load(open('schemas/openapi/smart-bubble-calc.yaml')); print('[OK] OpenAPI contracts linted successfully.')\"",
+        "cwd": "contracts"
+      },
+      "inputs": ["default"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 -c \"import os; assert os.path.exists('schemas/openapi/smart-bubble-calc.yaml'); print('[OK] Contract file presence verified.')\"",
+        "cwd": "contracts"
+      },
+      "inputs": ["default"]
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 -c \"print('[OK] Contract bundles ready.')\"",
+        "cwd": "contracts"
+      },
+      "inputs": ["default"]
+    },
+    "audit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 ../scripts/audit-runner.py --scope .",
+        "cwd": "contracts"
+      },
+      "inputs": ["default"]
+    }
+  }
+}

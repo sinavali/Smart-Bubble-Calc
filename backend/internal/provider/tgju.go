@@ -2,8 +2,6 @@ package provider
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -62,7 +60,7 @@ func NewDomesticAggregator(client *http.Client) *DomesticAggregator {
 			CoinQuarter: 18600000.0,
 			CoinGerami:  8700000.0,
 			DirhamAED:   19100.0,
-			FetchedAt:   time.Now(),
+			FetchedAt:   time.Now().UTC(),
 		},
 	}
 }
@@ -87,7 +85,7 @@ func (da *DomesticAggregator) FetchData(ctx context.Context) (*MarketRawData, bo
 		data.BTC = btc
 	}
 
-	data.FetchedAt = time.Now()
+	data.FetchedAt = time.Now().UTC()
 	if !isStale {
 		da.lastGood = &data
 	}

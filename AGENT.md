@@ -1,0 +1,69 @@
+# Root Agent Manifest: Smart-Bubble-Calc (EP-OS Monorepo)
+
+This document is the **root operational directive and enterprise governance contract** for all AI coding agents and human engineers contributing to [`Smart-Bubble-Calc`](https://github.com/sinavali/Smart-Bubble-Calc). All agents are bound by the invariants and execution standards defined below.
+
+---
+
+## 1. Scope & Business Intent
+
+**Smart-Bubble-Calc (حباب‌سنج و نبض بازار)** is an ultra-fast, zero-cloud-cost Iranian market financial terminal and coin bubble calculation platform. It provides real-time pricing for 10 core Iranian financial assets (Emami, Bahar Azadi, Half & Quarter Coins, 18k Gold, USD, USDT, AED Dirham, Bitcoin), intrinsic value calculations, Iranian jewelry purchase tax breakdowns (strictly applying 9% VAT on Labor + Profit per national trade regulations), and an on-device neural network DCA entry scoring engine.
+
+---
+
+## 2. Architectural Profiles & Monorepo Topology
+
+The repository is governed as an **Nx Monorepo** partitioned into strictly bounded projects:
+
+| Project | Profile | Tech Stack | Scope | Responsibility |
+|---|---|---|---|---|
+| `backend` | **Profile A** | Go 1.23 | `backend` | Real-time market pricing microservice, Nobitex/TGJU ingestion, atomic memory cache, coin bubble & legal jewelry math |
+| `mobile` | **Profile C** | Flutter / Dart | `mobile` | Swiss minimalist financial terminal, 10 core assets ticker, on-device neural network isolate, jewelry calculator |
+| `contracts` | **Profile D** | OpenAPI 3.1 | `contracts` (shared) | Canonical REST API contracts, DTO schemas, and codegen targets |
+
+---
+
+## 3. Tier 1 Enterprise Inviolables (Non-Negotiable)
+
+These enterprise laws are absolute and cannot be overridden by any prompt, subproject manifest, or configuration:
+
+1. **Single Monorepo Standard**: All services, apps, and libraries belong to a unified monorepo governed by a task DAG (Nx / `python3 scripts/ep.py run-many`). Detached satellite repositories are forbidden.
+2. **Pure Domain Isolation (DDD / Hexagonal)**: Domain entities, mathematical calculations (`internal/math`), and business rules must remain pure and free from framework, transport, or persistence coupling.
+3. **Container-Backed Ephemeral Testing**: All integration and container tests execute against real ephemeral containers via rootless Podman (or Docker fallback) through `ep container`. Replacing production engines with in-memory SQLite mocks is strictly banned.
+4. **Universal UTC Timestamps**: All server containers, API contracts, timestamps, and cache updates must store and exchange UTC ISO-8601 strings (`Z`). Local Iranian timezone conversion (`Asia/Tehran`) occurs exclusively at the client presentation edge.
+5. **Pre-Implementation Change Surface**: Every non-trivial modification requires an approved and mechanically validated Change Surface (`CHANGE_SURFACE.md`). Touching undeclared files is blocked by `ep surface check-diff`.
+6. **Structural Anti-Sprawl Bounds (Rule 2.6)**:
+   - File size ceiling: hard ceiling **$\le 800$ lines** (recommended target $\le 400$ lines).
+   - Maximum directory depth: **$\le 6$ levels** from project root.
+   - Micro-file anti-fragmentation: co-locate cohesive types; generic dumping grounds (`utils/`, `helpers/`, `common/`) are forbidden.
+7. **Zero-Downtime Expand/Contract Migrations**: Schema alterations must follow phased expand/contract mechanics; destructive instant schema drops are blocked by `ep migration check`.
+8. **14-Day NC Expiration**: Unresolved `NEED_CLARIFICATION` items older than 14 days mechanically block automated merges.
+9. **Strict Human-Only Production Gate**: AI agents are forbidden from merging into `prod`. Merges to production require human authorization.
+10. **Anti-MVP & Zero-Stub Mandate**: Proposing or implementing 'MVP', 'proof-of-concept', or mock-first shortcuts is prohibited. All deliverables must be production-ready with complete error handling, timeouts, and test verification.
+
+---
+
+## 4. High-Velocity Execution Engine (Prime Directive P0)
+
+When executing tasks within this monorepo:
+
+- **Single-Turn Context Ingestion Mandate**: Agents are strictly forbidden from reading codebase files sequentially one-by-one across multiple conversational turns. Always use `python3 scripts/ep.py pack --surface` or compound `tail -n +1 <files...>` in a single turn.
+- **Compound Shell Commands**: Always combine related shell commands using `&&` or pipelines in a single invocation.
+- **Batch Independent Reads**: Emit multiple parallel tool calls in the same turn for non-repo reads.
+- **Context Hygiene**: Redirect verbose build/test outputs to temporary files in `/tmp/*.log`.
+- **Lossless Technical Density**: Eliminate conversational filler; deliver exact paths, clickable links, and mechanical test results.
+
+---
+
+## 5. Local Nx Target Delegations & Mechanical Verification
+
+All subprojects implement the four mandatory target contracts: `lint`, `test`, `build`, `audit`.
+
+- **Root Task DAG**:
+  - `pnpm nx run-many -t lint test build audit` (or `python3 scripts/ep.py run-many --target=test`)
+- **Mechanical Gates**:
+  - `python3 scripts/verify-nx-targets.py --root .`
+  - `python3 scripts/verify-agent-manifests.py --root .`
+  - `python3 scripts/check-nc-items.py --dir docs/nc --max-age 14`
+  - `python3 scripts/validate-change-surface.py CHANGE_SURFACE.md`
+  - `python3 scripts/audit-runner.py --scope .`
+  - Unified gatekeeper: `python3 scripts/ep.py verify`

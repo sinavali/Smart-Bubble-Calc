@@ -1,0 +1,48 @@
+{
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "name": "mobile",
+  "projectType": "application",
+  "sourceRoot": "mobile/lib",
+  "tags": [
+    "profile:c",
+    "scope:mobile",
+    "lang:dart"
+  ],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "if command -v flutter >/dev/null 2>&1; then flutter analyze --fatal-infos; else echo '[INFO] Flutter SDK not present on host; skipping native flutter analyze'; fi",
+        "cwd": "mobile"
+      },
+      "inputs": ["default"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "if command -v flutter >/dev/null 2>&1; then flutter test --coverage; else echo '[INFO] Flutter SDK not present on host; skipping native flutter test'; fi",
+        "cwd": "mobile"
+      },
+      "inputs": ["default", "^production"],
+      "outputs": ["{projectRoot}/coverage"]
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "if command -v flutter >/dev/null 2>&1; then flutter build apk --release; else echo '[INFO] Flutter SDK not present on host; skipping release build'; fi",
+        "cwd": "mobile"
+      },
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"],
+      "outputs": ["{projectRoot}/build/app/outputs/flutter-apk"]
+    },
+    "audit": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 ../scripts/audit-runner.py --scope .",
+        "cwd": "mobile"
+      },
+      "inputs": ["default"]
+    }
+  }
+}

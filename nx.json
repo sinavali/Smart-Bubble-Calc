@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": [
+      "{projectRoot}/**/*"
+    ],
+    "production": [
+      "default",
+      "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(d)",
+      "!{projectRoot}/tests/**/*",
+      "!{projectRoot}/ci/**/*"
+    ]
+  },
+  "targetDefaults": {
+    "lint": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    },
+    "test": {
+      "inputs": [
+        "default",
+        "^production"
+      ],
+      "cache": true
+    },
+    "build": {
+      "inputs": [
+        "production",
+        "^production"
+      ],
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": true
+    },
+    "audit": {
+      "inputs": [
+        "default"
+      ],
+      "cache": true
+    }
+  },
+  "defaultBase": "main"
+}

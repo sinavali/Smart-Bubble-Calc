@@ -1,0 +1,232 @@
+openapi: 3.1.0
+info:
+  title: Smart Bubble Calc API
+  description: High-performance real-time Iranian coin bubble calculation and market terminal API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+paths:
+  /healthz:
+    get:
+      summary: Health Check Endpoint
+      description: Returns HTTP 200 OK once the in-memory cache has been populated.
+      responses:
+        "200":
+          description: Server is healthy and operational
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: OK
+
+  /api/v1/market:
+    get:
+      summary: Market Overview & Bubble Analysis
+      description: Returns the real-time pricing, intrinsic values, and bubble percentages for 10 core Iranian financial assets. Supports ETag conditional caching.
+      parameters:
+        - name: If-None-Match
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Client-side cached ETag hash for HTTP 304 response.
+      responses:
+        "200":
+          description: Real-time market data
+          headers:
+            ETag:
+              schema:
+                type: string
+              description: MD5 checksum of current market snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MarketResponse"
+        "304":
+          description: Not Modified (content matches client ETag)
+
+  /api/v1/calculate/jewelry:
+    post:
+      summary: Legal Jewelry Tax Calculator
+      description: Calculates the exact purchase breakdown for 18k gold jewelry strictly complying with Iranian tax regulations (9% VAT on Labor + Profit ONLY).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JewelryCalculationRequest"
+      responses:
+        "200":
+          description: Calculated jewelry purchase breakdown
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JewelryCalculationResponse"
+        "400":
+          description: Invalid calculation parameters
+
+  /api/v1/admin/config:
+    get:
+      summary: Get Dynamic Runtime Configuration
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Current dynamic configuration
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminConfig"
+        "401":
+          description: Unauthorized
+    post:
+      summary: Update Dynamic Runtime Configuration
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminConfig"
+      responses:
+        "200":
+          description: Configuration updated successfully
+        "401":
+          description: Unauthorized
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    MarketResponse:
+      type: object
+      required:
+        - last_updated
+        - items
+      properties:
+        last_updated:
+          type: string
+          format: date-time
+          example: "2026-10-19T02:30:00Z"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MarketItem"
+
+    MarketItem:
+      type: object
+      required:
+        - id
+        - name_fa
+        - market_price
+        - intrinsic_price
+        - bubble_amount
+        - bubble_percent
+      properties:
+        id:
+          type: string
+          example: "coin_emami"
+        name_fa:
+          type: string
+          example: "سکه امامی"
+        market_price:
+          type: number
+          format: double
+          example: 52500000.0
+        intrinsic_price:
+          type: number
+          format: double
+          example: 44200000.0
+        bubble_amount:
+          type: number
+          format: double
+          example: 8300000.0
+        bubble_percent:
+          type: number
+          format: double
+          example: 18.77
+
+    JewelryCalculationRequest:
+      type: object
+      required:
+        - weight_gram
+        - gram_18k_price
+        - labor_value
+        - is_labor_percentage
+        - profit_pct
+        - vat_pct
+      properties:
+        weight_gram:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 5.0
+        gram_18k_price:
+          type: number
+          format: double
+          minimum: 1.0
+          example: 4500000.0
+        labor_value:
+          type: number
+          format: double
+          minimum: 0.0
+          example: 15.0
+        is_labor_percentage:
+          type: boolean
+          example: true
+        profit_pct:
+          type: number
+          format: double
+          minimum: 0.0
+          example: 7.0
+        vat_pct:
+          type: number
+          format: double
+          minimum: 0.0
+          example: 9.0
+
+    JewelryCalculationResponse:
+      type: object
+      required:
+        - raw_gold_price
+        - labor_amount
+        - profit_amount
+        - vat_amount
+        - total_price
+      properties:
+        raw_gold_price:
+          type: number
+          format: double
+          example: 22500000.0
+        labor_amount:
+          type: number
+          format: double
+          example: 3375000.0
+        profit_amount:
+          type: number
+          format: double
+          example: 1811250.0
+        vat_amount:
+          type: number
+          format: double
+          example: 466763.0
+        total_price:
+          type: number
+          format: double
+          example: 28153013.0
+
+    AdminConfig:
+      type: object
+      properties:
+        poll_interval_seconds:
+          type: integer
+          minimum: 5
+          example: 30
+        admin_token:
+          type: string
+          example: "secret-token"

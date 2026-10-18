@@ -24,7 +24,7 @@ COPY --from=builder /app/bubble-server .
 COPY config.json .
 
 ENV PORT=8080
-ENV TZ=Asia/Tehran
+ENV TZ=UTC
 
 EXPOSE 8080
 
