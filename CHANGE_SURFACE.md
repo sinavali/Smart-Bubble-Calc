@@ -67,11 +67,28 @@ Transition the Smart-Bubble-Calc repository from an uncoordinated multi-folder l
 - `ci/ci.yml.example`: Enterprise CI pipeline template with mechanical gates and Nx matrix.
 - `backend/AGENT.md`: Subproject Agent Manifest for Go backend (Profile A).
 - `backend/project.json`: Nx target contracts (`lint`, `test`, `build`, `audit`) for Go backend.
+- `backend/internal/math/shamsi.go`: Solar Hijri (Shamsi) mathematical conversion and Tehran timezone formatting.
+- `backend/internal/math/shamsi_test.go`: Unit tests for Gregorian <-> Shamsi conversions.
 - `mobile/AGENT.md`: Subproject Agent Manifest for Flutter mobile app (Profile C).
 - `mobile/project.json`: Nx target contracts (`lint`, `test`, `build`, `audit`) for Flutter mobile app.
 - `mobile/pubspec.yaml`: Flutter project metadata and dependencies.
 - `mobile/analysis_options.yaml`: Flutter static analysis and linting rules.
-- `mobile/lib/main.dart`: Flutter entry point with Swiss minimalist theme.
+- `mobile/lib/main.dart`: Flutter entry point with Swiss minimalist theme, Tehran clock, and navigation tabs.
+- `mobile/lib/core/shamsi_date.dart`: Standalone Shamsi calendar math with zero half-spaces.
+- `mobile/lib/core/persian_number.dart`: Persian digit conversion, comma formatting, and words generator.
+- `mobile/lib/core/theme.dart`: Swiss minimalist terminal theme with dark palette and gold accents.
+- `mobile/lib/core/api_client.dart`: Resilient API client with offline cache and on-device legal tax engine.
+- `mobile/lib/widgets/shamsi_date_picker.dart`: Interactive Shamsi date picker modal.
+- `mobile/lib/widgets/status_pill.dart`: Terminal state and risk level pill badge.
+- `mobile/lib/widgets/sparkline.dart`: Lightweight flat sparkline graph.
+- `mobile/lib/features/market/market_screen.dart`: Live 10 core Iranian financial assets ticker.
+- `mobile/lib/features/jewelry/jewelry_screen.dart`: Legal Iranian jewelry calculator (9% VAT on labor+profit).
+- `mobile/lib/features/advisor/advisor_screen.dart`: DCA bubble evaluator and portfolio allocation advisor.
+- `mobile/lib/features/settings/settings_screen.dart`: Settings, Tehran date converter, and legal reference.
+- `mobile/test/shamsi_date_test.dart`: Unit tests for Shamsi calendar conversion and leap years.
+- `mobile/test/persian_number_test.dart`: Unit tests for Persian numerals and words conversion.
+- `mobile/test/jewelry_math_test.dart`: Unit tests for legal jewelry tax formula.
+- `mobile/test/widget_test.dart`: Smoke tests for mobile terminal app.
 - `contracts/AGENT.md`: Subproject Agent Manifest for Shared Contracts (Profile D).
 - `contracts/project.json`: Nx target contracts (`lint`, `test`, `build`, `audit`) for OpenAPI contracts.
 - `contracts/schemas/openapi/smart-bubble-calc.yaml`: Canonical OpenAPI 3.1 contract specification.
@@ -79,10 +96,21 @@ Transition the Smart-Bubble-Calc repository from an uncoordinated multi-folder l
 
 ### Modified Files
 - `.gitignore`: Add `.ep/sessions/`, `.freebuff/`, and ephemeral test outputs.
+- `README.md`: Update documentation and clean zero half-spaces.
+- `AGENT.md`: Clean zero half-spaces and align governance instructions.
+- `CLAUDE.md`: Universal manifest projection without half-spaces.
+- `.cursorrules`: IDE rules without half-spaces.
+- `.windsurfrules`: Windsurf rules without half-spaces.
+- `backend/README.md`: Clean zero half-spaces.
+- `backend/config.json`: Clean zero half-spaces.
+- `backend/internal/cache/cache.go`: Add risk levels, risk labels, ISO timestamp, and Shamsi date fields.
+- `backend/internal/math/bubble.go`: Export Round utility function.
 - `backend/internal/provider/tgju.go`: Remove unused `"encoding/json"` and `"fmt"` imports.
 - `backend/internal/math/bubble_test.go`: Fix float rounding assertion in `TestJewelryCalculation`.
-- `backend/cmd/server/main.go`: Remove unused `"fmt"` import.
+- `backend/cmd/server/main.go`: Add `/api/v1/shamsi/today` and `/api/v1/historical` endpoints.
 - `backend/Dockerfile`: Configure `ENV TZ=UTC` adhering to Tier 1 UTC convention.
+- `mobile/README.md`: Clean zero half-spaces.
+- `contracts/schemas/openapi/smart-bubble-calc.yaml`: Add ShamsiDateResponse and historical endpoints.
 
 ## 4. Test Surface
 

@@ -8,7 +8,7 @@ This document is the **root operational directive and enterprise governance cont
 
 ## 1. Scope & Business Intent
 
-**Smart-Bubble-Calc (حباب‌سنج و نبض بازار)** is an ultra-fast, zero-cloud-cost Iranian market financial terminal and coin bubble calculation platform. It provides real-time pricing for 10 core Iranian financial assets (Emami, Bahar Azadi, Half & Quarter Coins, 18k Gold, USD, USDT, AED Dirham, Bitcoin), intrinsic value calculations, Iranian jewelry purchase tax breakdowns (strictly applying 9% VAT on Labor + Profit per national trade regulations), and an on-device neural network DCA entry scoring engine.
+**Smart-Bubble-Calc (حباب سنج و نبض بازار)** is an ultra-fast, zero-cloud-cost Iranian market financial terminal and coin bubble calculation platform. It provides real-time pricing for 10 core Iranian financial assets (Emami, Bahar Azadi, Half & Quarter Coins, 18k Gold, USD, USDT, AED Dirham, Bitcoin), intrinsic value calculations, Iranian jewelry purchase tax breakdowns (strictly applying 9% VAT on Labor + Profit per national trade regulations), and an on-device neural network DCA entry scoring engine.
 
 ---
 

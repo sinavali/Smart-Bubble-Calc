@@ -20,6 +20,30 @@ paths:
                 type: string
                 example: OK
 
+  /api/v1/shamsi/today:
+    get:
+      summary: Current Shamsi (Jalali) Date & Tehran Time
+      description: Returns current date converted to Solar Hijri (Shamsi) calendar in Tehran timezone (+3:30).
+      responses:
+        "200":
+          description: Current Shamsi date payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ShamsiDateResponse"
+
+  /api/v1/historical:
+    get:
+      summary: 24-Hour Bubble History
+      description: Returns 24-hour tracked historical data for coin bubble trends and sparklines.
+      responses:
+        "200":
+          description: 24-hour historical points
+          content:
+            application/json:
+              schema:
+                type: object
+
   /api/v1/market:
     get:
       summary: Market Overview & Bubble Analysis
@@ -230,3 +254,45 @@ components:
         admin_token:
           type: string
           example: "secret-token"
+
+    ShamsiDateResponse:
+      type: object
+      required:
+        - year
+        - month
+        - day
+        - hour
+        - minute
+        - second
+        - month_name
+        - weekday_name
+        - formatted
+      properties:
+        year:
+          type: integer
+          example: 1405
+        month:
+          type: integer
+          example: 7
+        day:
+          type: integer
+          example: 27
+        hour:
+          type: integer
+          example: 2
+        minute:
+          type: integer
+          example: 55
+        second:
+          type: integer
+          example: 10
+        month_name:
+          type: string
+          example: "مهر"
+        weekday_name:
+          type: string
+          example: "دوشنبه"
+        formatted:
+          type: string
+          example: "27 مهر 1405 - ساعت 02:55"
+

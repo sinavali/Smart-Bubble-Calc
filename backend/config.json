@@ -107,7 +107,7 @@
     {
       "id": "btc",
       "symbol": "BTC",
-      "name_fa": "بیت‌کوین",
+      "name_fa": "بیت کوین",
       "category": "crypto",
       "enabled": true,
       "display_order": 10,

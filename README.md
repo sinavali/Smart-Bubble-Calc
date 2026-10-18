@@ -1,4 +1,4 @@
-# Smart Bubble Calc (حباب‌سنج و نبض بازار)
+# Smart Bubble Calc (حباب سنج و نبض بازار)
 
 A production-grade, zero-cost monorepo for real-time asset pricing, coin bubble calculations, jewelry shopping protection, and on-device machine learning for Iranian users.
 

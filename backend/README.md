@@ -1,4 +1,4 @@
-# Bubble Calc Backend (حباب‌سنج و نبض بازار)
+# Bubble Calc Backend (حباب سنج و نبض بازار)
 
 High-performance, ultra-low resource (~15MB RAM) Go backend for real-time asset pricing, coin bubble calculations, and legal jewelry purchase breakdowns.
 

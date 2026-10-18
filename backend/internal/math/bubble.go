@@ -66,3 +66,8 @@ func CalculateJewelry(weightGram, gram18kPrice, laborValue float64, isLaborPerce
 		TotalPrice:   math.Round(total),
 	}
 }
+
+// Round rounds a float64 to the nearest integer.
+func Round(val float64) float64 {
+	return math.Round(val)
+}
