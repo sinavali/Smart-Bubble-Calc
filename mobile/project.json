@@ -43,6 +43,13 @@
         "cwd": "mobile"
       },
       "inputs": ["default"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 ../scripts/dev_all.py",
+        "cwd": "mobile"
+      }
     }
   }
 }

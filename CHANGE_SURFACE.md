@@ -92,10 +92,15 @@ Transition the Smart-Bubble-Calc repository from an uncoordinated multi-folder l
 - `contracts/AGENT.md`: Subproject Agent Manifest for Shared Contracts (Profile D).
 - `contracts/project.json`: Nx target contracts (`lint`, `test`, `build`, `audit`) for OpenAPI contracts.
 - `contracts/schemas/openapi/smart-bubble-calc.yaml`: Canonical OpenAPI 3.1 contract specification.
+- `scripts/dev_all.py`: Local development and Android emulator testing orchestrator for Fedora Linux.
+- `scripts/dev-all.sh`: Shell executable wrapper for `dev:all`.
 - `.ep/baseline.json`: Initial ratchet baseline technical debt snapshot.
 
 ### Modified Files
 - `.gitignore`: Add `.ep/sessions/`, `.freebuff/`, and ephemeral test outputs.
+- `package.json`: Add dev:all npm script for Fedora testing.
+- `backend/project.json`: Add dev target for backend container runner.
+- `mobile/project.json`: Add dev target for mobile testing runner.
 - `README.md`: Update documentation and clean zero half-spaces.
 - `AGENT.md`: Clean zero half-spaces and align governance instructions.
 - `CLAUDE.md`: Universal manifest projection without half-spaces.

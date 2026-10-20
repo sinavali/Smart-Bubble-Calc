@@ -42,3 +42,26 @@ A production-grade, zero-cost monorepo for real-time asset pricing, coin bubble 
 ## CI/CD Pipeline
 
 Automated unit tests and race detection (`go test -v -race ./...`) run automatically on GitHub Actions on every push to `main`.
+
+---
+
+## Local Development & Android Testing (Fedora Linux)
+
+To run and test the complete product on your local Fedora machine:
+
+```bash
+# Run full product testing suite (Backend + Android Emulator + Flutter)
+pnpm dev:all
+# or
+python3 scripts/dev_all.py
+```
+
+### Fedora Prerequisites & Android Emulation
+- **Hardware Acceleration**: Automatically uses `/dev/kvm` hardware virtualization.
+- **Backend Service**: Bootstrapped inside an ephemeral container on `http://127.0.0.1:8080` with Tehran Shamsi datetime support.
+- **Android Port Mapping**: Automatically configures `adb reverse tcp:8080 tcp:8080` so the mobile app inside the emulator communicates with the local Iranian financial backend.
+- **Fedora Toolchain Installation**:
+  ```bash
+  sudo dnf install -y android-tools java-17-openjdk-devel
+  ```
+

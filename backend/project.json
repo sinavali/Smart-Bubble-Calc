@@ -43,6 +43,13 @@
         "cwd": "backend"
       },
       "inputs": ["default"]
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3 ../scripts/dev_all.py --backend-only",
+        "cwd": "backend"
+      }
     }
   }
 }

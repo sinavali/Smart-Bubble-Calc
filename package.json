@@ -13,6 +13,7 @@
   },
   "scripts": {
     "nx": "nx",
+    "dev:all": "python3 scripts/dev_all.py",
     "lint": "python3 scripts/ep.py run-many --target=lint",
     "test": "python3 scripts/ep.py run-many --target=test",
     "build": "python3 scripts/ep.py run-many --target=build",
