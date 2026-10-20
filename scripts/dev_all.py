@@ -27,6 +27,7 @@ C_BOLD = "\033[1m"
 C_RESET = "\033[0m"
 
 BACKEND_CONTAINER_NAME = "smart-bubble-dev-backend"
+PODMAN_ANDROID_CONTAINER_NAME = "smart-bubble-android-emulator"
 DEFAULT_BACKEND_PORT = 8080
 
 
@@ -34,7 +35,7 @@ def print_banner():
     banner = f"""{C_GOLD}{C_BOLD}
 ========================================================================
   SMART BUBBLE CALC // سامانه حباب سنج و نبض بازار
-  Local Development & Android Product Runner (Fedora Linux)
+  Compact Local Development & Android Product Runner (Fedora Linux)
 ========================================================================{C_RESET}
 """
     print(banner)
@@ -46,10 +47,10 @@ def check_kvm() -> bool:
     if os.path.exists(kvm_path):
         is_writable = os.access(kvm_path, os.R_OK | os.W_OK)
         if is_writable:
-            print(f"{C_EMERALD}[KVM]{C_RESET} Hardware virtualization (/dev/kvm) is available and writable.")
+            print(f"{C_EMERALD}[KVM]{C_RESET} Hardware virtualization (/dev/kvm) is active and accessible.")
             return True
         else:
-            print(f"{C_AMBER}[KVM]{C_RESET} /dev/kvm exists but requires group permission. Run: sudo usermod -aG kvm $USER")
+            print(f"{C_AMBER}[KVM]{C_RESET} /dev/kvm exists but requires group permission: sudo usermod -aG kvm $USER")
             return False
     else:
         print(f"{C_CORAL}[KVM]{C_RESET} /dev/kvm not found! Hardware virtualization may be disabled in BIOS.")
@@ -69,7 +70,7 @@ def get_fedora_info() -> str:
 
 
 def locate_android_tools():
-    """Locates adb and emulator binaries across PATH and standard Android SDK locations."""
+    """Locates adb and emulator binaries across PATH and standard SDK locations."""
     sdk_roots = [
         os.environ.get("ANDROID_HOME", ""),
         os.environ.get("ANDROID_SDK_ROOT", ""),
@@ -154,7 +155,7 @@ def get_shamsi_today(port: int = DEFAULT_BACKEND_PORT) -> str:
 
 
 def start_backend_service(port: int = DEFAULT_BACKEND_PORT, root_dir: str = ".") -> subprocess.Popen | None:
-    """Starts the backend service using Podman container or native Go."""
+    """Starts the backend service using Podman container."""
     print(f"{C_CYAN}[BACKEND]{C_RESET} Starting Iranian financial calculation server on port {port}...")
 
     # Stop any previous leftover container
@@ -202,33 +203,74 @@ def start_backend_service(port: int = DEFAULT_BACKEND_PORT, root_dir: str = ".")
     return None
 
 
-def print_fedora_android_setup_guide():
-    """Prints clear, copy-pasteable instructions for Fedora Linux developers."""
+def start_podman_android_emulator() -> bool:
+    """Launches a lightweight containerized Android emulator via Podman with noVNC web display."""
+    print(f"\n{C_CYAN}[PODMAN-ANDROID]{C_RESET} Launching containerized Android emulator with KVM acceleration...")
+    # Check if already running
+    chk = subprocess.run(["podman", "ps", "--filter", f"name={PODMAN_ANDROID_CONTAINER_NAME}", "--format", "{{.Names}}"], stdout=subprocess.PIPE, text=True)
+    if PODMAN_ANDROID_CONTAINER_NAME in chk.stdout:
+        print(f"{C_EMERALD}[PODMAN-ANDROID]{C_RESET} Container '{PODMAN_ANDROID_CONTAINER_NAME}' is already active.")
+        print(f"{C_GOLD}[WEB-DISPLAY]{C_RESET} Open your browser at: {C_BOLD}http://127.0.0.1:6080{C_RESET} to view/control the device.")
+        return True
+
+    cmd = [
+        "podman", "run", "-d",
+        "--name", PODMAN_ANDROID_CONTAINER_NAME,
+        "-p", "6080:6080",
+        "-p", "5555:5555",
+        "--device", "/dev/kvm",
+        "-e", "EMULATOR_DEVICE=Samsung Galaxy S10",
+        "-e", "WEB_VNC=true",
+        "docker.io/budtmo/docker-android:emulator_11.0"
+    ]
+    try:
+        subprocess.run(cmd, check=True)
+        print(f"{C_EMERALD}[PODMAN-ANDROID]{C_RESET} Emulator container started successfully!")
+        print(f"{C_GOLD}[WEB-DISPLAY]{C_RESET} Open: {C_BOLD}http://127.0.0.1:6080{C_RESET} (noVNC web viewer)")
+        print(f"{C_MUTED}[ADB-CONNECT]{C_RESET} Run: 'adb connect 127.0.0.1:5555'")
+        return True
+    except Exception as e:
+        print(f"{C_CORAL}[PODMAN-ANDROID]{C_RESET} Failed to start container: {e}")
+        return False
+
+
+def print_fedora_compact_android_guide():
+    """Prints lightweight, compact alternatives to heavy Android Studio for Fedora developers."""
     guide = f"""
-{C_AMBER}{C_BOLD}[FEDORA ANDROID SETUP REQUIRED]{C_RESET}
-To run the full Android emulator on Fedora Linux, execute the following commands:
+{C_AMBER}{C_BOLD}[LIGHTWEIGHT & COMPACT ANDROID TESTING OPTIONS FOR FEDORA]{C_RESET}
+You do NOT need the heavy 4GB Android Studio IDE! Choose one of these 3 compact solutions:
 
-1. Install Android CLI tools & JDK:
-   {C_GOLD}sudo dnf install -y android-tools java-17-openjdk-devel{C_RESET}
+{C_GOLD}{C_BOLD}Solution 1: Containerized Android with Podman (Zero Host SDK Bloat){C_RESET}
+Run a full Android emulator inside Podman with KVM acceleration and view it in your browser:
+  {C_CYAN}pnpm dev:all --podman-android{C_RESET}
+  View and control screen live at: {C_BOLD}http://127.0.0.1:6080{C_RESET} (noVNC Web Interface)
 
-2. (Recommended) Install Android Studio for Fedora via Flatpak or Official RPM:
-   {C_GOLD}flatpak install -y flathub com.google.AndroidStudio{C_RESET}
-   or download Android Command Line Tools to ~/Android/Sdk.
+{C_GOLD}{C_BOLD}Solution 2: Physical Android Device + scrcpy (Fastest & Lightest: 15MB total){C_RESET}
+Plug any Android phone into USB with USB Debugging enabled:
+  {C_CYAN}sudo dnf install -y scrcpy android-tools{C_RESET}
+  {C_CYAN}scrcpy{C_RESET}
+  (120 FPS hardware-accelerated screen mirror directly on KDE Plasma desktop with 0% CPU overhead)
 
-3. Verify KVM permissions for hardware acceleration:
-   {C_GOLD}sudo usermod -aG kvm $USER{C_RESET}
+{C_GOLD}{C_BOLD}Solution 3: Minimal CLI-only Android Tools (No Android Studio GUI, ~130MB){C_RESET}
+Download only Google's command line tools to ~/Android/Sdk without the heavy IDE:
+  {C_CYAN}sudo dnf install -y android-tools java-17-openjdk-devel{C_RESET}
+  Run: {C_CYAN}emulator -avd <your_avd> -accel on{C_RESET}
 
-4. Create a virtual device (AVD) in Android Studio Device Manager:
-   Recommended: Pixel 7 / Pixel 8, System Image: Android 14 (API 34) or 15 (API 35) with Google APIs x86_64.
+{C_GOLD}{C_BOLD}Solution 4: Flutter Native Linux Desktop or Web (Instant 0-second testing){C_RESET}
+Test the exact same code natively on Fedora without any Android emulation:
+  {C_CYAN}cd mobile && flutter run -d linux{C_RESET}
+  or
+  {C_CYAN}cd mobile && flutter run -d chrome{C_RESET}
 """
     print(guide)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Smart-Bubble-Calc local development runner for Fedora")
+    parser = argparse.ArgumentParser(description="Smart-Bubble-Calc compact local development runner for Fedora")
     parser.add_argument("--port", type=int, default=DEFAULT_BACKEND_PORT, help="Backend port (default: 8080)")
     parser.add_argument("--backend-only", action="store_true", help="Start only backend service")
     parser.add_argument("--emulator-only", action="store_true", help="Start only Android emulator")
+    parser.add_argument("--podman-android", action="store_true", help="Run containerized Android emulator via Podman with noVNC web display")
     parser.add_argument("--avd", type=str, default="", help="Specific AVD name to launch")
     parser.add_argument("--timeout", type=int, default=120, help="Emulator boot timeout in seconds")
     args = parser.parse_args()
@@ -243,17 +285,17 @@ def main():
     if adb_bin:
         print(f"{C_EMERALD}[ADB]{C_RESET} Found adb at: {adb_bin}")
     else:
-        print(f"{C_AMBER}[ADB]{C_RESET} adb not found in PATH or standard SDK roots.")
+        print(f"{C_AMBER}[ADB]{C_RESET} adb not found on host. (Can be installed via: sudo dnf install -y android-tools)")
 
     if emulator_bin:
-        print(f"{C_EMERALD}[EMULATOR]{C_RESET} Found emulator at: {emulator_bin}")
-    else:
-        print(f"{C_AMBER}[EMULATOR]{C_RESET} Android emulator binary not found in standard paths.")
+        print(f"{C_EMERALD}[EMULATOR]{C_RESET} Found emulator binary at: {emulator_bin}")
 
     # Cleanup handler
     def cleanup_handler(signum, frame):
         print(f"\n{C_AMBER}[SHUTDOWN]{C_RESET} Stopping development containers and background processes...")
         subprocess.run(["podman", "stop", BACKEND_CONTAINER_NAME], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if args.podman_android:
+            subprocess.run(["podman", "stop", PODMAN_ANDROID_CONTAINER_NAME], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if adb_bin:
             try:
                 subprocess.run([adb_bin, "reverse", "--remove-all"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -280,30 +322,40 @@ def main():
         while True:
             time.sleep(1)
 
-    # Step 2: Android Emulator Setup
-    print(f"\n{C_CYAN}[ANDROID]{C_RESET} Checking Android emulator status on Fedora...")
+    # Step 2: Podman Containerized Android Emulator Mode
+    if args.podman_android:
+        start_podman_android_emulator()
+        if adb_bin:
+            time.sleep(2)
+            subprocess.run([adb_bin, "connect", "127.0.0.1:5555"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run([adb_bin, "-s", "127.0.0.1:5555", "reverse", f"tcp:{args.port}", f"tcp:{args.port}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        print(f"\n{C_GOLD}[PRODUCT READY (PODMAN ANDROID)]{C_RESET}")
+        print(f"  • Backend Server: {C_BOLD}http://127.0.0.1:{args.port}{C_RESET}")
+        print(f"  • Web Emulator Display: {C_BOLD}http://127.0.0.1:6080{C_RESET}")
+        print(f"  • ADB Endpoint: {C_BOLD}127.0.0.1:5555{C_RESET}")
+        print(f"\nPress Ctrl+C to terminate services.")
+        while True:
+            time.sleep(1)
+
+    # Step 3: Check standard or physical devices
+    print(f"\n{C_CYAN}[DEVICE-SCAN]{C_RESET} Checking for connected Android devices or emulators...")
 
     running_devices = get_running_devices(adb_bin)
-    emulator_device = None
-    for d in running_devices:
-        if d.startswith("emulator-"):
-            emulator_device = d
-            break
+    active_device = running_devices[0] if running_devices else None
 
-    if emulator_device:
-        print(f"{C_EMERALD}[DEVICE]{C_RESET} Active Android emulator detected: {C_BOLD}{emulator_device}{C_RESET}")
+    if active_device:
+        print(f"{C_EMERALD}[DEVICE]{C_RESET} Active device detected: {C_BOLD}{active_device}{C_RESET}")
     else:
         avds = list_configured_avds(emulator_bin)
         if not emulator_bin or not avds:
-            print_fedora_android_setup_guide()
-            print(f"{C_MUTED}[INFO]{C_RESET} Backend is active on port {args.port}. You can test API or Flutter mobile web/desktop.")
-            print(f"{C_BOLD}[TIPS]{C_RESET} Run: 'cd mobile && flutter run -d linux' or 'flutter run -d chrome'")
+            print_fedora_compact_android_guide()
+            print(f"{C_MUTED}[INFO]{C_RESET} Backend is active on port {args.port}.")
             print(f"\n{C_EMERALD}[RUNNING]{C_RESET} Backend live at http://127.0.0.1:{args.port}. Press Ctrl+C to stop.")
             while True:
                 time.sleep(1)
 
         target_avd = args.avd if args.avd else avds[0]
-        print(f"{C_CYAN}[LAUNCH]{C_RESET} Booting Android AVD: {C_BOLD}{target_avd}{C_RESET} with KVM hardware acceleration...")
+        print(f"{C_CYAN}[LAUNCH]{C_RESET} Booting native Android AVD: {C_BOLD}{target_avd}{C_RESET} with KVM hardware acceleration...")
 
         emu_cmd = [emulator_bin, "-avd", target_avd, "-accel", "on", "-gpu", "host"]
         subprocess.Popen(emu_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -316,39 +368,34 @@ def main():
             devices = get_running_devices(adb_bin)
             for d in devices:
                 if d.startswith("emulator-"):
-                    # Check boot complete
                     res = subprocess.run([adb_bin, "-s", d, "shell", "getprop", "sys.boot_completed"], stdout=subprocess.PIPE, text=True)
                     if res.stdout.strip() == "1":
-                        emulator_device = d
+                        active_device = d
                         print(f" {C_EMERALD}BOOT COMPLETE ({d}){C_RESET}")
                         break
-            if emulator_device:
+            if active_device:
                 break
 
-        if not emulator_device:
-            print(f" {C_AMBER}TIMEOUT{C_RESET}")
-            print(f"{C_AMBER}[WARN]{C_RESET} Emulator is still starting up. It will appear once finished.")
-
-    # Step 3: Reverse Port Forwarding for Android
-    if emulator_device and adb_bin:
-        print(f"{C_CYAN}[PORT-FORWARD]{C_RESET} Configuring adb reverse tcp:{args.port} -> tcp:{args.port} for emulator...")
+    # Step 4: Reverse Port Forwarding for Android
+    if active_device and adb_bin:
+        print(f"{C_CYAN}[PORT-FORWARD]{C_RESET} Configuring adb reverse tcp:{args.port} -> tcp:{args.port} for {active_device}...")
         try:
-            subprocess.run([adb_bin, "-s", emulator_device, "reverse", f"tcp:{args.port}", f"tcp:{args.port}"], check=True)
-            print(f"{C_EMERALD}[PORT-FORWARD]{C_RESET} Successfully mapped. Android app can connect to http://127.0.0.1:{args.port} or http://10.0.2.2:{args.port}!")
+            subprocess.run([adb_bin, "-s", active_device, "reverse", f"tcp:{args.port}", f"tcp:{args.port}"], check=True)
+            print(f"{C_EMERALD}[PORT-FORWARD]{C_RESET} Successfully mapped. Android app connects to http://127.0.0.1:{args.port} or http://10.0.2.2:{args.port}!")
         except Exception as e:
             print(f"{C_AMBER}[PORT-FORWARD]{C_RESET} Warning: adb reverse failed: {e}")
 
-    # Step 4: Flutter Mobile Client launch
+    # Step 5: Flutter Mobile Client launch
     flutter_bin = shutil.which("flutter")
     if flutter_bin:
-        print(f"{C_CYAN}[MOBILE]{C_RESET} Launching Flutter mobile app on {emulator_device or 'emulator'}...")
-        target_flag = ["-d", emulator_device] if emulator_device else []
+        print(f"{C_CYAN}[MOBILE]{C_RESET} Launching Flutter mobile app on {active_device or 'default device'}...")
+        target_flag = ["-d", active_device] if active_device else []
         flutter_cmd = [flutter_bin, "run"] + target_flag
         subprocess.run(flutter_cmd, cwd="mobile")
     else:
         print(f"\n{C_GOLD}[PRODUCT READY]{C_RESET}")
         print(f"  • Backend Server: {C_BOLD}http://127.0.0.1:{args.port}{C_RESET}")
-        print(f"  • Android Emulator Port Mapping: {C_BOLD}tcp:{args.port} -> tcp:{args.port}{C_RESET}")
+        print(f"  • Android Device Port Mapping: {C_BOLD}tcp:{args.port} -> tcp:{args.port}{C_RESET}")
         print(f"  • To run Flutter client: {C_BOLD}cd mobile && flutter run{C_RESET}")
         print(f"\nPress Ctrl+C to terminate services.")
         while True:

@@ -47,21 +47,35 @@ Automated unit tests and race detection (`go test -v -race ./...`) run automatic
 
 ## Local Development & Android Testing (Fedora Linux)
 
-To run and test the complete product on your local Fedora machine:
+To run and test the complete product on your local Fedora machine without heavy IDE bloat (No Android Studio needed):
 
 ```bash
-# Run full product testing suite (Backend + Android Emulator + Flutter)
+# Run full product testing suite (Backend + Android Testing + Flutter)
 pnpm dev:all
 # or
 python3 scripts/dev_all.py
 ```
 
-### Fedora Prerequisites & Android Emulation
-- **Hardware Acceleration**: Automatically uses `/dev/kvm` hardware virtualization.
-- **Backend Service**: Bootstrapped inside an ephemeral container on `http://127.0.0.1:8080` with Tehran Shamsi datetime support.
-- **Android Port Mapping**: Automatically configures `adb reverse tcp:8080 tcp:8080` so the mobile app inside the emulator communicates with the local Iranian financial backend.
-- **Fedora Toolchain Installation**:
-  ```bash
-  sudo dnf install -y android-tools java-17-openjdk-devel
-  ```
+### Compact & Lightweight Android Options (Zero Android Studio)
+1. **Podman Containerized Android (Zero Host SDK Bloat)**:
+   ```bash
+   pnpm dev:all --podman-android
+   ```
+   Runs a containerized Android emulator via Podman with KVM acceleration. View and control the phone directly in your browser at `http://127.0.0.1:6080` (noVNC).
+
+2. **Physical Android Device + scrcpy (15MB lightweight package)**:
+   Connect any Android phone via USB with USB Debugging enabled:
+   ```bash
+   sudo dnf install -y scrcpy android-tools
+   scrcpy
+   ```
+   Gives 120 FPS hardware-accelerated screen mirroring directly on KDE Plasma desktop with 0% CPU overhead.
+
+3. **Flutter Native Linux Desktop or Web (Instant 0-second testing)**:
+   ```bash
+   cd mobile && flutter run -d linux
+   # or
+   cd mobile && flutter run -d chrome
+   ```
+
 
