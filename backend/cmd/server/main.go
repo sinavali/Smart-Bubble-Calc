@@ -56,6 +56,7 @@ func main() {
 
 	// Setup HTTP router
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", srv.handleAppShell)
 	mux.HandleFunc("/healthz", srv.handleHealthz)
 	mux.HandleFunc("/api/v1/market", srv.handleMarket)
 	mux.HandleFunc("/api/v1/calculate/jewelry", srv.handleJewelryCalc)

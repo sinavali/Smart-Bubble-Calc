@@ -92,6 +92,9 @@ Transition the Smart-Bubble-Calc repository from an uncoordinated multi-folder l
 - `contracts/AGENT.md`: Subproject Agent Manifest for Shared Contracts (Profile D).
 - `contracts/project.json`: Nx target contracts (`lint`, `test`, `build`, `audit`) for OpenAPI contracts.
 - `contracts/schemas/openapi/smart-bubble-calc.yaml`: Canonical OpenAPI 3.1 contract specification.
+- `backend/cmd/server/app_shell.go`: Instant zero-download Swiss minimalist mobile simulator web shell.
+- `backend/cmd/server/app_shell_css.go`: Modular stylesheet for mobile simulator web shell.
+- `backend/cmd/server/app_shell_script.go`: Modular client logic for mobile simulator web shell.
 - `scripts/dev_all.py`: Local development and Android emulator testing orchestrator for Fedora Linux.
 - `scripts/dev-all.sh`: Shell executable wrapper for `dev:all`.
 - `.ep/baseline.json`: Initial ratchet baseline technical debt snapshot.
