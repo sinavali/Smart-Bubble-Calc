@@ -230,7 +230,9 @@ def start_podman_android_emulator() -> bool:
         print(f"{C_MUTED}[ADB-CONNECT]{C_RESET} Run: 'adb connect 127.0.0.1:5555'")
         return True
     except Exception as e:
-        print(f"{C_CORAL}[PODMAN-ANDROID]{C_RESET} Failed to start container: {e}")
+        print(f"{C_CORAL}[PODMAN-ANDROID]{C_RESET} Failed to pull/start container: {e}")
+        print(f"{C_AMBER}[NETWORK / SANCTIONS NOTICE]{C_RESET} Direct pulls from docker.io often fail in Iran (dial tcp: lookup auth.docker.io).")
+        print(f"Furthermore, full containerized Android images are ~5.8 GB.")
         return False
 
 
@@ -324,15 +326,20 @@ def main():
 
     # Step 2: Podman Containerized Android Emulator Mode
     if args.podman_android:
-        start_podman_android_emulator()
-        if adb_bin:
-            time.sleep(2)
-            subprocess.run([adb_bin, "connect", "127.0.0.1:5555"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            subprocess.run([adb_bin, "-s", "127.0.0.1:5555", "reverse", f"tcp:{args.port}", f"tcp:{args.port}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(f"\n{C_GOLD}[PRODUCT READY (PODMAN ANDROID)]{C_RESET}")
-        print(f"  • Backend Server: {C_BOLD}http://127.0.0.1:{args.port}{C_RESET}")
-        print(f"  • Web Emulator Display: {C_BOLD}http://127.0.0.1:6080{C_RESET}")
-        print(f"  • ADB Endpoint: {C_BOLD}127.0.0.1:5555{C_RESET}")
+        ok = start_podman_android_emulator()
+        if ok:
+            if adb_bin:
+                time.sleep(2)
+                subprocess.run([adb_bin, "connect", "127.0.0.1:5555"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                subprocess.run([adb_bin, "-s", "127.0.0.1:5555", "reverse", f"tcp:{args.port}", f"tcp:{args.port}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            print(f"\n{C_GOLD}[PRODUCT READY (PODMAN ANDROID)]{C_RESET}")
+            print(f"  • Backend Server: {C_BOLD}http://127.0.0.1:{args.port}{C_RESET}")
+            print(f"  • Web Emulator Display: {C_BOLD}http://127.0.0.1:6080{C_RESET}")
+            print(f"  • ADB Endpoint: {C_BOLD}127.0.0.1:5555{C_RESET}")
+        else:
+            print_fedora_compact_android_guide()
+            print(f"\n{C_EMERALD}[BACKEND LIVE]{C_RESET} Backend is active on http://127.0.0.1:{args.port}.")
+
         print(f"\nPress Ctrl+C to terminate services.")
         while True:
             time.sleep(1)
