@@ -54,5 +54,15 @@ void main() {
         expect(ShamsiDate.daysInMonth(1405, m), 30);
       }
     });
+
+    test('addDays rolls over month boundaries correctly', () {
+      // 27 Mehr 1405 + 5 days -> 2 Aban 1405
+      const start = ShamsiDate(year: 1405, month: 7, day: 27);
+      final next = start.addDays(5);
+      expect(next.year, 1405);
+      expect(next.month, 8);
+      expect(next.day, 2);
+      expect(next.monthName, 'آبان');
+    });
   });
 }

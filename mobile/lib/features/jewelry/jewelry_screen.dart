@@ -27,6 +27,7 @@ class _JewelryScreenState extends State<JewelryScreen> {
   final _profitController = TextEditingController(text: '7.0');
   final _vatController = TextEditingController(text: '9.0');
 
+  int _selectedCarat = 750;
   bool _isLaborPercentage = true;
   ShamsiDate _invoiceDate = ShamsiDate.now();
   JewelryCalculationResponse? _result;
@@ -53,19 +54,20 @@ class _JewelryScreenState extends State<JewelryScreen> {
       final market = await widget.apiClient.fetchMarket();
       for (final a in market.assets) {
         if (a.id == 'gold_18k' && a.price > 0) {
+          final adjusted = (a.price * (_selectedCarat / 750.0)).round();
           setState(() {
-            _priceController.text = a.price.round().toString();
+            _priceController.text = adjusted.toString();
           });
           _recalculate();
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
-                  'نرخ طلای 18 عیار از نبض بازار به روز رسانی شد',
+                  'نرخ ${_caratLabel(_selectedCarat)} از نبض بازار به روز رسانی شد',
                   textDirection: TextDirection.rtl,
                 ),
                 backgroundColor: TerminalTheme.cardDark,
-                duration: Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
@@ -73,6 +75,31 @@ class _JewelryScreenState extends State<JewelryScreen> {
         }
       }
     } catch (_) {}
+  }
+
+  void _onCaratChanged(int newCarat) {
+    final currentPrice = double.tryParse(PersianNumber.toLatinDigits(_priceController.text)) ?? 4500000.0;
+    final base18k = currentPrice / (_selectedCarat / 750.0);
+    final adjusted = (base18k * (newCarat / 750.0)).round();
+    setState(() {
+      _selectedCarat = newCarat;
+      _priceController.text = adjusted.toString();
+    });
+    _recalculate();
+  }
+
+  String _caratLabel(int carat) {
+    switch (carat) {
+      case 999:
+        return '24 عیار (999 / شمش خالص)';
+      case 875:
+        return '21 عیار (875 / استاندارد یزدی)';
+      case 740:
+        return 'متفرقه (740)';
+      case 750:
+      default:
+        return '18 عیار (750 / استاندارد بازار)';
+    }
   }
 
   void _recalculate() {
@@ -117,8 +144,9 @@ class _JewelryScreenState extends State<JewelryScreen> {
     final sb = StringBuffer();
     sb.writeln('صورتحساب خرید طلا - سامانه حباب سنج');
     sb.writeln('تاریخ: $dateStr');
+    sb.writeln('عیار طلا: ${_caratLabel(_selectedCarat)}');
     sb.writeln('وزن طلا: $weight گرم');
-    sb.writeln('نرخ هر گرم 18 عیار: ${PersianNumber.formatToman(double.tryParse(price) ?? 0)}');
+    sb.writeln('نرخ هر گرم: ${PersianNumber.formatToman(double.tryParse(price) ?? 0)}');
     sb.writeln('قیمت طلای خام: ${PersianNumber.formatToman(_result!.rawGoldPrice)}');
     sb.writeln('اجرت ساخت: ${PersianNumber.formatToman(_result!.laborAmount)}');
     sb.writeln('سود طلافروش: ${PersianNumber.formatToman(_result!.profitAmount)}');
@@ -146,7 +174,10 @@ class _JewelryScreenState extends State<JewelryScreen> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         backgroundColor: TerminalTheme.carbonBlack,
-        body: SingleChildScrollView(
+        body: GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          behavior: HitTestBehavior.opaque,
+          child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,13 +279,32 @@ class _JewelryScreenState extends State<JewelryScreen> {
                     ),
                     const SizedBox(height: 14),
 
+                    // Carat Selector Row
+                    Row(
+                      children: [
+                        const Text(
+                          'عیار:',
+                          style: TextStyle(fontSize: 12, color: TerminalTheme.textSecondary),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildCaratChip('18 عیار', 750),
+                        const SizedBox(width: 6),
+                        _buildCaratChip('24 عیار', 999),
+                        const SizedBox(width: 6),
+                        _buildCaratChip('21 عیار', 875),
+                        const SizedBox(width: 6),
+                        _buildCaratChip('740', 740),
+                      ],
+                    ),
+                    const SizedBox(height: 14),
+
                     // Price per gram Input & Live Sync Button
                     TextField(
                       controller: _priceController,
                       keyboardType: TextInputType.number,
                       style: const TextStyle(color: TerminalTheme.textPrimary, fontSize: 15),
                       decoration: InputDecoration(
-                        labelText: 'قیمت هر گرم طلای 18 عیار (تومان)',
+                        labelText: 'قیمت هر گرم طلا (تومان)',
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.sync, color: TerminalTheme.goldAccent),
                           tooltip: 'دریافت از نبض بازار',
@@ -468,6 +518,33 @@ class _JewelryScreenState extends State<JewelryScreen> {
                 ),
               ],
             ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+  Widget _buildCaratChip(String label, int carat) {
+    final isSelected = _selectedCarat == carat;
+    return InkWell(
+      onTap: () => _onCaratChanged(carat),
+      borderRadius: BorderRadius.circular(4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? TerminalTheme.goldAccent : TerminalTheme.cardLight,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            color: isSelected ? TerminalTheme.goldBright : TerminalTheme.borderColor,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? TerminalTheme.carbonBlack : TerminalTheme.textSecondary,
           ),
         ),
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/api_client.dart';
 import '../../core/persian_number.dart';
+import '../../core/shamsi_date.dart';
 import '../../core/theme.dart';
 import '../../widgets/status_pill.dart';
 
@@ -19,6 +20,7 @@ class AdvisorScreen extends StatefulWidget {
 
 class _AdvisorScreenState extends State<AdvisorScreen> {
   final _capitalController = TextEditingController(text: '100000000'); // 100M Toman
+  final Set<int> _completedSteps = {};
   String _timeHorizon = 'medium'; // short, medium, long
   MarketResponse? _market;
   bool _isLoading = true;
@@ -319,6 +321,8 @@ class _AdvisorScreenState extends State<AdvisorScreen> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    _buildDcaScheduleSection(capital),
                   ],
                 ),
               ),
@@ -418,6 +422,199 @@ class _AdvisorScreenState extends State<AdvisorScreen> {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDcaScheduleSection(double capital) {
+    if (capital <= 0) return const SizedBox.shrink();
+
+    final now = ShamsiDate.now();
+    final stepAmount = capital / 4.0;
+    final progress = _completedSteps.length / 4.0;
+
+    final steps = [
+      {
+        'title': 'پله اول (ورود اولیه)',
+        'date': now,
+        'action': 'خرید طلای 18 عیار بدون حباب یا آبشده',
+        'rationale': 'ایجاد پایه امن سبد دارایی بدون ریسک حباب سکه',
+      },
+      {
+        'title': 'پله دوم (2 هفته بعد)',
+        'date': now.addDays(14),
+        'action': 'بررسی نسبت حباب سکه بهار آزادی و خرید پله ای',
+        'rationale': 'ورود به سکه در صورت آرامش بازار یا ادامه خرید طلای 18 عیار',
+      },
+      {
+        'title': 'پله سوم (1 ماه بعد)',
+        'date': now.addDays(30),
+        'action': 'تکمیل میانگین وزنی خرید در اصلاح های قیمتی',
+        'rationale': 'استفاده از نوسانات ماهانه بازار برای کاهش قیمت تمام شده',
+      },
+      {
+        'title': 'پله چهارم (2 ماه بعد)',
+        'date': now.addDays(60),
+        'action': 'تثبیت سبد سرمایه گذاری و نگهداری نقدینگی رزرو',
+        'rationale': 'تکمیل فرایند خرید پله ای با حداقل استرس روانی',
+      },
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: TerminalTheme.cardDark,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: TerminalTheme.borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.calendar_today, color: TerminalTheme.goldAccent, size: 18),
+                  SizedBox(width: 8),
+                  Text(
+                    'جدول زمانبندی هوشمند خرید پله ای',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: TerminalTheme.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              StatusPill(
+                label: 'پیشرفت: ${PersianNumber.toPersianDigits((progress * 100).round().toString())}%',
+                color: progress == 1.0 ? TerminalTheme.signalEmerald : TerminalTheme.goldAccent,
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: TerminalTheme.cardLight,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                progress == 1.0 ? TerminalTheme.signalEmerald : TerminalTheme.goldAccent,
+              ),
+              minHeight: 6,
+            ),
+          ),
+          const SizedBox(height: 14),
+          ...List.generate(steps.length, (index) {
+            final step = steps[index];
+            final stepDate = step['date'] as ShamsiDate;
+            final isCompleted = _completedSteps.contains(index);
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isCompleted
+                    ? TerminalTheme.signalEmerald.withOpacity(0.08)
+                    : TerminalTheme.cardLight,
+                borderRadius: BorderRadius.circular(4),
+                border: Border.all(
+                  color: isCompleted
+                      ? TerminalTheme.signalEmerald.withOpacity(0.4)
+                      : TerminalTheme.borderColor,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (isCompleted) {
+                                  _completedSteps.remove(index);
+                                } else {
+                                  _completedSteps.add(index);
+                                }
+                              });
+                            },
+                            child: Icon(
+                              isCompleted
+                                  ? Icons.check_circle
+                                  : Icons.radio_button_unchecked,
+                              size: 18,
+                              color: isCompleted
+                                  ? TerminalTheme.signalEmerald
+                                  : TerminalTheme.textMuted,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            step['title'] as String,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isCompleted
+                                  ? TerminalTheme.signalEmerald
+                                  : TerminalTheme.textPrimary,
+                              decoration: isCompleted
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        PersianNumber.formatToman(stepAmount),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: TerminalTheme.goldAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        step['action'] as String,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: TerminalTheme.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      Text(
+                        PersianNumber.toPersianDigits(
+                          stepDate.format(includeTime: false),
+                        ),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: TerminalTheme.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    step['rationale'] as String,
+                    style: const TextStyle(
+                      fontSize: 10,
+                      color: TerminalTheme.textMuted,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ],
       ),
     );

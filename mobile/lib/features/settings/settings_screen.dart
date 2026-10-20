@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/api_client.dart';
 import '../../core/persian_number.dart';
@@ -78,6 +79,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
           backgroundColor: TerminalTheme.cardDark,
         ),
       );
+    }
+  }
+
+  Future<void> _testConnection() async {
+    final url = _urlController.text.trim();
+    try {
+      final client = http.Client();
+      final resp = await client.get(Uri.parse('$url/healthz')).timeout(const Duration(seconds: 3));
+      if (mounted) {
+        if (resp.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('ارتباط با سرور برقرار است (وضعیت سالم)', textDirection: TextDirection.rtl),
+              backgroundColor: TerminalTheme.signalEmerald,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('پاسخ سرور: کد ${resp.statusCode}', textDirection: TextDirection.rtl),
+              backgroundColor: TerminalTheme.signalAmber,
+            ),
+          );
+        }
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('عدم برقراری ارتباط با سرور (سامانه با کش آفلاین فعال است)', textDirection: TextDirection.rtl),
+            backgroundColor: TerminalTheme.signalCoral,
+          ),
+        );
+      }
     }
   }
 
@@ -237,15 +272,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    ElevatedButton(
-                      onPressed: _saveUrl,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: TerminalTheme.goldAccent,
-                        foregroundColor: TerminalTheme.carbonBlack,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                      ),
-                      child: const Text('ذخیره آدرس سرور', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _saveUrl,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: TerminalTheme.goldAccent,
+                              foregroundColor: TerminalTheme.carbonBlack,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            ),
+                            child: const Text('ذخیره آدرس سرور', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        OutlinedButton(
+                          onPressed: _testConnection,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: TerminalTheme.goldAccent),
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                          ),
+                          child: const Text('تست اتصال', style: TextStyle(color: TerminalTheme.goldAccent, fontSize: 13)),
+                        ),
+                      ],
                     ),
                   ],
                 ),

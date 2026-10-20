@@ -112,6 +112,12 @@ class ShamsiDate {
     return isLeapYear(jy) ? 30 : 29;
   }
 
+  /// Adds days to this ShamsiDate
+  ShamsiDate addDays(int days) {
+    final dt = toDateTime().add(Duration(days: days));
+    return fromDateTime(dt);
+  }
+
   ShamsiDate copyWith({
     int? year,
     int? month,
