@@ -213,7 +213,7 @@ def cmd_ast(args: argparse.Namespace) -> int:
 
         print(f"[FAIL] Detected {len(findings)} structural AST violation(s):", file=sys.stderr)
         for f in findings:
-            print(f"  ❌ [{f['id']}] {f['file']}:{f['line']}", file=sys.stderr)
+            print(f"  [FAIL] [{f['id']}] {f['file']}:{f['line']}", file=sys.stderr)
             print(f"     Match: {f['snippet']}", file=sys.stderr)
             print(f"     Note: {f['description']}", file=sys.stderr)
         return 1

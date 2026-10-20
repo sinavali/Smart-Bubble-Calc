@@ -125,7 +125,7 @@ def cmd_sync_skill(args: argparse.Namespace) -> int:
     if check_only:
         if diffs:
             for p, st in diffs:
-                print(f"  ❌ [{st}] {p}")
+                print(f"  [FAIL] [{st}] {p}")
             return 1
         print("[PASS] Skill and workspace are in 100% cryptographic parity.")
         return 0
@@ -146,7 +146,7 @@ def cmd_sync_skill(args: argparse.Namespace) -> int:
 
     print(f"[SUCCESS] Synchronized {len(synced)} file(s).")
     for s in synced:
-        print(f"  ✅ {s}")
+        print(f"  [PASS] {s}")
 
     # Re-verify parity
     post_skill = get_tracked_manifest(skill_dir)

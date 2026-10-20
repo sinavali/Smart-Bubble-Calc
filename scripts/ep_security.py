@@ -224,7 +224,7 @@ def cmd_security(args: argparse.Namespace) -> int:
         print("[FAIL] CRITICAL SECURITY GATE: Secrets or credentials detected!", file=sys.stderr)
         for item in findings:
             loc = f"{item['file']}:{item.get('line', 1)}" if item['file'] else "staged"
-            print(f"  ❌ [{item['type']}] at {loc}", file=sys.stderr)
+            print(f"  [FAIL] [{item['type']}] at {loc}", file=sys.stderr)
             print(f"     Match: {item['matched']}", file=sys.stderr)
             print(f"     Note: {item['description']}", file=sys.stderr)
         print("\nRemediation: Remove hardcoded credentials. Use environment variables or secret managers.", file=sys.stderr)
@@ -349,7 +349,7 @@ def cmd_license(args: argparse.Namespace) -> int:
     for m in manifests:
         lic = m["license"].upper()
         is_risky = any(cl in lic for cl in COPYLEFT_LICENSES)
-        symbol = "❌" if is_risky else "✅"
+        symbol = "[FAIL]" if is_risky else "[PASS]"
         print(f"  {symbol} [{m['project']}] -> {m['license']} ({m['file']})")
         if is_risky:
             violations.append(m)
@@ -484,7 +484,7 @@ def cmd_iac(args: argparse.Namespace) -> int:
     warning_count = len(findings) - blocking_count
 
     for f in findings:
-        icon = "❌" if f["severity"] == "blocking" else "⚠️"
+        icon = "[FAIL]" if f["severity"] == "blocking" else "[WARN]️"
         print(f"  {icon} [{f['rule']}] at {f['file']}:{f['line']}")
         print(f"     Note: {f['description']}")
 

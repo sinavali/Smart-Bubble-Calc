@@ -264,15 +264,16 @@ def main():
             pass
 
     print(f"\n{C_GOLD}{C_BOLD}[PRODUCT READY // آماده برای استفاده]{C_RESET}")
-    print(f"  • {C_BOLD}Mobile Terminal UI:{C_RESET} {C_CYAN}{simulator_url}{C_RESET}")
-    print(f"  • {C_BOLD}Backend Healthz:{C_RESET}    http://127.0.0.1:{args.port}/healthz")
-    print(f"  • {C_BOLD}Market Quotes API:{C_RESET}  http://127.0.0.1:{args.port}/api/v1/market")
-    print(f"  • {C_BOLD}Shamsi Today API:{C_RESET}   http://127.0.0.1:{args.port}/api/v1/shamsi/today")
+    print(f"  * {C_BOLD}Mobile Terminal UI:{C_RESET} {C_CYAN}{simulator_url}{C_RESET}")
+    print(f"  * {C_BOLD}Backend Healthz:{C_RESET}    http://127.0.0.1:{args.port}/healthz")
+    print(f"  * {C_BOLD}Market Quotes API:{C_RESET}  http://127.0.0.1:{args.port}/api/v1/market")
+    print(f"  * {C_BOLD}Official Laws API:{C_RESET}  http://127.0.0.1:{args.port}/api/v1/laws")
+    print(f"  * {C_BOLD}Shamsi Today API:{C_RESET}   http://127.0.0.1:{args.port}/api/v1/shamsi/today")
     print(f"\n{C_MUTED}Interactive features available in browser view:")
-    print("  1. 📈 Live Tehran Market Watch & Coin Bubbles (Emami, Bahar Azadi, Nim, Rob, Gerami)")
-    print("  2. ⚖️ Legal Jewelry Calculator (18k, 24k, 21k, 740, 9% VAT strictly on Ojrat+Profit)")
-    print("  3. 🧠 Smart DCA Multi-Step Investment Planner with Tehran Jalali Calendar")
-    print(f"  4. ⚙️ Shamsi Date Picker & Converter{C_RESET}")
+    print("  1. [MARKET] Live Tehran Market Watch & Coin Bubbles (Emami, Bahar Azadi, Nim, Rob, Gerami)")
+    print("  2. [CALC] Legal Jewelry Calculator (18k, 24k, 21k, 740, 9% VAT strictly on Ojrat+Profit)")
+    print("  3. [LAWS] Official Iranian Gold Bazaar Statutes (VAT Art 26, Guild 7%, AML, Trade System)")
+    print(f"  4. [DATETIME] Shamsi DateTime Converter & Interactive Jalali Picker (Tehran TZ){C_RESET}")
     print(f"\n{C_EMERALD}Press Ctrl+C to terminate services.{C_RESET}")
 
     while True:

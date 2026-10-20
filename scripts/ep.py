@@ -137,7 +137,7 @@ def cmd_surface(args: argparse.Namespace) -> int:
             print("[FAIL] MECHANICAL BLAST-RADIUS VIOLATION!", file=sys.stderr)
             print("The following modified files were NOT declared in the Change Surface:", file=sys.stderr)
             for f in out_of_bounds:
-                print(f"  ❌ {f}", file=sys.stderr)
+                print(f"  [FAIL] {f}", file=sys.stderr)
             print("\nRemediation: Update '## 3. Code Surface' in your Change Surface or revert out-of-scope edits.", file=sys.stderr)
             return 1
 
@@ -262,7 +262,7 @@ def cmd_migration(args: argparse.Namespace) -> int:
         print("[FAIL] EXPAND/CONTRACT MIGRATION GATE VIOLATION!", file=sys.stderr)
         print("Destructive database operations detected that break rolling zero-downtime deployments:\n", file=sys.stderr)
         for f, l, desc, match in violations:
-            print(f"  ❌ {f}:{l} -> Found '{match}'", file=sys.stderr)
+            print(f"  [FAIL] {f}:{l} -> Found '{match}'", file=sys.stderr)
             print(f"     Reason: {desc}", file=sys.stderr)
         print("\nRemediation: Follow Expand/Contract phased lifecycle (see references/core-directives.md).", file=sys.stderr)
         print("If this is Phase 5 (Contract cleanup), add an approved ADR comment: '-- adr-ref: docs/adr/NNNN-contract.md'.", file=sys.stderr)
@@ -303,7 +303,7 @@ def cmd_graph(args: argparse.Namespace) -> int:
         if violations:
             print("[FAIL] Architectural Boundary Violations Detected!", file=sys.stderr)
             for f_path, reason in violations:
-                print(f"  ❌ {f_path}: {reason}", file=sys.stderr)
+                print(f"  [FAIL] {f_path}: {reason}", file=sys.stderr)
             return 1
         print("[OK] Architectural Boundary Integrity Verified. Zero illegal imports detected.")
         return 0

@@ -13,14 +13,17 @@ import (
 
 	"bubble_calc/internal/cache"
 	"bubble_calc/internal/config"
+	"bubble_calc/internal/laws"
 	"bubble_calc/internal/math"
 	"bubble_calc/internal/provider"
+	"strings"
 )
 
 type Server struct {
 	cfgManager *config.ConfigManager
 	cache      *cache.AtomicCache
 	aggregator *provider.DomesticAggregator
+	lawsMgr    *laws.LawsManager
 }
 
 func main() {
@@ -41,11 +44,14 @@ func main() {
 
 	appCache := cache.NewAtomicCache()
 	agg := provider.NewDomesticAggregator(nil)
+	lawsManager := laws.NewLawsManager()
+	lawsManager.StartDailyWorker()
 
 	srv := &Server{
 		cfgManager: cfgMgr,
 		cache:      appCache,
 		aggregator: agg,
+		lawsMgr:    lawsManager,
 	}
 
 	// Initial data sync
@@ -63,6 +69,7 @@ func main() {
 	mux.HandleFunc("/api/v1/admin/config", srv.handleAdminConfig)
 	mux.HandleFunc("/api/v1/shamsi/today", srv.handleShamsiToday)
 	mux.HandleFunc("/api/v1/historical", srv.handleHistorical)
+	mux.HandleFunc("/api/v1/laws", srv.handleLaws)
 
 	httpServer := &http.Server{
 		Addr:         ":" + port,
@@ -76,7 +83,7 @@ func main() {
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		log.Printf("🚀 Bubble Calc Backend running on :%s (PID: %d)", port, os.Getpid())
+		log.Printf("[SERVER] Bubble Calc Backend running on :%s (PID: %d)", port, os.Getpid())
 		if err := httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server Listen error: %v", err)
 		}
@@ -84,6 +91,7 @@ func main() {
 
 	<-stopChan
 	log.Println("Shutting down gracefully...")
+	srv.lawsMgr.Stop()
 
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -398,4 +406,39 @@ func (s *Server) handleHistorical(w http.ResponseWriter, r *http.Request) {
 		"current_shamsi": shamsi.Formatted,
 		"timeline_24h":   points,
 	})
+}
+
+func (s *Server) handleLaws(w http.ResponseWriter, r *http.Request) {
+	snap := s.lawsMgr.GetSnapshot()
+	if snap == nil {
+		http.Error(w, `{"error":"laws cache uninitialized"}`, http.StatusServiceUnavailable)
+		return
+	}
+
+	cat := r.URL.Query().Get("category")
+	q := strings.TrimSpace(r.URL.Query().Get("q"))
+
+	if cat == "" && q == "" {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		_, _ = w.Write(snap.RawJSON)
+		return
+	}
+
+	filtered := make([]laws.LawArticle, 0, len(snap.Payload.Articles))
+	for _, a := range snap.Payload.Articles {
+		if cat != "" && string(a.Category) != cat {
+			continue
+		}
+		if q != "" && !strings.Contains(a.Title, q) && !strings.Contains(a.Summary, q) && !strings.Contains(a.Reference, q) {
+			continue
+		}
+		filtered = append(filtered, a)
+	}
+
+	payload := snap.Payload
+	payload.TotalCount = len(filtered)
+	payload.Articles = filtered
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	_ = json.NewEncoder(w).Encode(payload)
 }

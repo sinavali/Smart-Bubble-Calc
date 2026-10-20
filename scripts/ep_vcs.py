@@ -151,7 +151,7 @@ def cmd_vcs(args: argparse.Namespace) -> int:
         if not ok:
             print("[FAIL] VCS Topology Drift Detected!", file=sys.stderr)
             for iss in issues:
-                print(f"  ❌ {iss}", file=sys.stderr)
+                print(f"  [FAIL] {iss}", file=sys.stderr)
             print("\nRemediation: Fast-forward or rebase promotion branches from 'main'.", file=sys.stderr)
             return 1
         print("[OK] Multi-Tier VCS Topology in sync. Zero rogue commits detected.")

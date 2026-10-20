@@ -184,7 +184,7 @@ def cmd_session(args: argparse.Namespace) -> int:
         if collisions:
             print("[COLLISION] Concurrent Session Mutation Conflict Detected!", file=sys.stderr)
             for s1, s2, overlap in collisions:
-                print(f"  ❌ Conflict between Session '{s1}' and '{s2}':", file=sys.stderr)
+                print(f"  [FAIL] Conflict between Session '{s1}' and '{s2}':", file=sys.stderr)
                 for f in overlap:
                     print(f"     • {f}", file=sys.stderr)
             print("\nRemediation: Commit or stash changes before switching contexts, or coordinate worktree separation.", file=sys.stderr)

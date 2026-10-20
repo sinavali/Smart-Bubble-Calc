@@ -95,6 +95,8 @@ Transition the Smart-Bubble-Calc repository from an uncoordinated multi-folder l
 - `backend/cmd/server/app_shell.go`: Instant zero-download Swiss minimalist mobile simulator web shell.
 - `backend/cmd/server/app_shell_css.go`: Modular stylesheet for mobile simulator web shell.
 - `backend/cmd/server/app_shell_script.go`: Modular client logic for mobile simulator web shell.
+- `backend/internal/laws/laws.go`: Official Iranian gold bazaar statutes and daily cached laws engine.
+- `backend/internal/laws/laws_test.go`: Unit tests for Iranian gold bazaar laws manager.
 - `scripts/dev_all.py`: Local development and Android emulator testing orchestrator for Fedora Linux.
 - `scripts/dev-all.sh`: Shell executable wrapper for `dev:all`.
 - `.ep/baseline.json`: Initial ratchet baseline technical debt snapshot.

@@ -212,21 +212,21 @@ def cmd_slo(args: argparse.Namespace) -> int:
             errors = validate_slo_dict(parsed, norm_path)
             if errors:
                 all_errors.extend(errors)
-                print(f"❌ {norm_path}: Invalid schema")
+                print(f"[FAIL] {norm_path}: Invalid schema")
                 for err in errors:
                     print(f"     • {err}")
             else:
                 svc = parsed.get("service") or "unspecified"
                 tier = parsed.get("tier") or "tier-1"
                 slo_count = len(parsed.get("slos", []))
-                print(f"✅ {norm_path}")
+                print(f"[PASS] {norm_path}")
                 print(f"   Service: {svc} ({tier}) | {slo_count} SLO target(s) defined:")
                 for s in parsed.get("slos", []):
                     pct = f"{float(s.get('target', 0)) * 100:.2f}%"
                     print(f"     • [{s.get('id')}] {s.get('name')}: Target {pct} (Window: {s.get('window')})")
         except Exception as e:
             all_errors.append(f"{norm_path}: Failed to parse: {e}")
-            print(f"❌ {norm_path}: Parse exception: {e}")
+            print(f"[FAIL] {norm_path}: Parse exception: {e}")
 
     if all_errors:
         print(f"\n[FAIL] SLO Validation failed with {len(all_errors)} defect(s).", file=sys.stderr)
@@ -339,9 +339,9 @@ def cmd_codeowners(args: argparse.Namespace) -> int:
     for sp in subprojects:
         if sp["owner"] == "UNASSIGNED":
             unowned.append(sp)
-            print(f"  ❌ [{sp['name']}] -> UNASSIGNED")
+            print(f"  [FAIL] [{sp['name']}] -> UNASSIGNED")
         else:
-            print(f"  ✅ [{sp['name']}] -> {sp['owner']}")
+            print(f"  [PASS] [{sp['name']}] -> {sp['owner']}")
 
     if unowned:
         print(f"\n[FAIL] {len(unowned)} subproject(s) lack assigned code owners!", file=sys.stderr)
